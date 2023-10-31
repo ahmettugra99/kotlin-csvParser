@@ -1,13 +1,19 @@
-package tugra.politicalspeech.service.checker
+package tugra.politicalspeech.utils.checker
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.server.LocalServerPort
+import tugra.politicalspeech.service.checker.CsvFilesUrlMapCheckerImpl
 import java.lang.reflect.Method
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CsvFilesUrlMapCheckerImplTest {
 
+    @LocalServerPort
+    private val port = 0
     private lateinit var csvFilesUrlMapChecker: CsvFilesUrlMapCheckerImpl
 
     @BeforeEach
@@ -51,5 +57,14 @@ class CsvFilesUrlMapCheckerImplTest {
         method.isAccessible = true
         val result = method.invoke(csvFilesUrlMapChecker, urlWithConnectionError) as Boolean
         assertFalse(result)
+    }
+
+    @Test
+    fun testIsUrlAccessible() {
+        val urlWithConnectionError = "http://localhost:" + port + "/testCsv.csv"
+        val method: Method = csvFilesUrlMapChecker::class.java.getDeclaredMethod("isUrlAccessible", String::class.java)
+        method.isAccessible = true
+        val result = method.invoke(csvFilesUrlMapChecker, urlWithConnectionError) as Boolean
+        assertTrue(result)
     }
 }
